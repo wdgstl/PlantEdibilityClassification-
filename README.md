@@ -35,3 +35,4 @@
    cd scripts
    python3 main.py
    ```
+6. **Open http://localhost:3000 in browser and play around!**
