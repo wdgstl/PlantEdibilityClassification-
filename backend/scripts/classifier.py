@@ -15,7 +15,7 @@ class classifier:
         #supplied custom model
         if model_path:
             self.model_path = model_path
-        #otherwise, pull default
+        #otherwise, pull defaultc
         else:
             print(f"Downloading model from {self.default_model_url}\n")
             output_file = "../data/models/resnet18_weights_best_acc.tar"

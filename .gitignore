@@ -1,0 +1,4 @@
+*.tar
+*names.json
+node_modules/
+__pycache__/
