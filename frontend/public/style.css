@@ -1,0 +1,26 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  #imageInput {
+    font-size: 1.2em;
+    padding: 10px;
+  }
+  
+  #uploadedImage {
+    margin-top: 20px;
+    max-width: 80%;
+    height: auto;
+    display: none;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  #caption {
+    margin-top: 20px;
+    font-size: 1.2em;
+    color: #333;
+  }
+  
