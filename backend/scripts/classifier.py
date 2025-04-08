@@ -1,4 +1,4 @@
-from utils import load_model
+from scripts.utils import load_model
 from torchvision.models import resnet18
 from torchvision import models, transforms
 import torch

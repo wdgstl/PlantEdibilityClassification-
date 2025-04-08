@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const file = imageInput.files?.[0];
     if (!file) return;
 
-    // Display image preview
     const reader = new FileReader();
     reader.onload = (e) => {
       uploadedImage.src = e.target.result;
@@ -15,14 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     reader.readAsDataURL(file);
 
-    // Send a fetch request to your backend
+    const formData = new FormData();
+    formData.append("file", file); 
+
     try {
-      const res = await fetch("http://localhost:8000/add?x=10&y=20");
-      const data = await res.json();
-      caption.textContent = `Prediction: ${data.result}`;
-    } catch (err) {
-      console.error("Error during fetch:", err);
-      caption.textContent = "Failed to get prediction.";
+      const response = await fetch("http://localhost:8000/predict", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+      caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}`;
+    } catch (error) {
+      console.error("Upload failed:", error);
+      caption.textContent = "Upload or prediction failed.";
     }
   });
 });
