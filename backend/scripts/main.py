@@ -1,3 +1,9 @@
+import sys
+from pathlib import Path
+
+# Add the parent directory of 'scripts' to the path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from scripts.classifier import * 
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -16,9 +22,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+BASE_DIR = Path(__file__).resolve().parent
+
 model = classifier(
-    model_path="data/models/resnet18_weights_best_acc.tar",
-    class_mapping_path="data/class_mapping/plantnet300K_species_names.json"
+    model_path=str(BASE_DIR.parent / "data/models/resnet18_weights_best_acc.tar"),
+    class_mapping_path=str(BASE_DIR.parent / "data/class_mapping/plantnet300K_species_names.json")
 )
 
 @app.post("/predict")
