@@ -4,6 +4,7 @@ from pathlib import Path
 # Add the parent directory of 'scripts' to the path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
+from scripts.describe_plant import get_description
 from scripts.classifier import * 
 from scripts.fetch_data import pull_data
 from fastapi import FastAPI, File, UploadFile
@@ -13,6 +14,15 @@ import shutil
 import uuid
 import os
 import uvicorn
+from dotenv import load_dotenv
+
+#if running main.py manually, replace with path to ur .env
+# load_dotenv("../.env")
+
+#if using docker, leave empty: 
+load_dotenv()
+
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 pull_data()
 
@@ -32,6 +42,7 @@ model = classifier(
     class_mapping_path=str(BASE_DIR.parent / "data/class_mapping/plantnet300K_species_names.json")
 )
 
+
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
     temp_dir = Path("temp_uploads")
@@ -47,6 +58,13 @@ async def predict(file: UploadFile = File(...)):
         os.remove(temp_file_path)
         return {"error": str(e)}
 
+@app.get("/describe")
+async def describe(plant_name):
+    if OPENAI_API_KEY:
+        description = get_description(plant_name=plant_name, OPENAI_KEY=OPENAI_API_KEY)
+    else:
+        description = "Add OpenAI API Key to get description and edibility of plant"
+    return {"message": description}
+
 if __name__ == "__main__":
-    
     uvicorn.run(app, host="0.0.0.0", port=8000)
