@@ -5,6 +5,7 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 from scripts.classifier import * 
+from scripts.fetch_data import pull_data
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
@@ -12,6 +13,8 @@ import shutil
 import uuid
 import os
 import uvicorn
+
+pull_data()
 
 app = FastAPI()
 app.add_middleware(
@@ -45,4 +48,5 @@ async def predict(file: UploadFile = File(...)):
         return {"error": str(e)}
 
 if __name__ == "__main__":
+    
     uvicorn.run(app, host="0.0.0.0", port=8000)
