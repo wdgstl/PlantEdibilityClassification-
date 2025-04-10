@@ -36,3 +36,17 @@
    python3 main.py
    ```
 6. **Open http://localhost:3000 in browser and play around!**
+
+
+## To add OpenAI Key for Edibility Description 
+
+### Option A: Using Docker
+   1. create .env inside backend directory
+   2. add OPENAI_KEY='KEY'
+   3. ensure main.py contains line: load_dotenv('path_to_ur_env')
+
+   ### Option B: Without Docker
+   1. create .env inside backend directory
+   2. add OPENAI_KEY='KEY'
+
+
