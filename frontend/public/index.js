@@ -2,7 +2,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const imageInput = document.getElementById("imageInput");
   const uploadedImage = document.getElementById("uploadedImage");
   const caption = document.getElementById("caption");
-  const description = document.getElementById("description")
+  const description = document.getElementById("description");
+
+  let loadingInterval;
+
+  function startLoadingAnimation(element, baseText = "Loading") {
+    let dotCount = 0;
+    loadingInterval = setInterval(() => {
+      dotCount = (dotCount + 1) % 4;
+      element.textContent = baseText + ".".repeat(dotCount);
+    }, 500);
+  }
+
+  function stopLoadingAnimation(element, finalText) {
+    clearInterval(loadingInterval);
+    element.textContent = finalText;
+  }
 
   imageInput.addEventListener("change", async () => {
     const file = imageInput.files?.[0];
@@ -26,27 +41,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const result = await response.json();
 
-      // Get top plant name from prediction list
       const topPrediction = result.prediction?.[0]?.[0];
 
-      // Show prediction immediately
       caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}`;
-      description.textContent = "Loading description...";
+      startLoadingAnimation(description, "Loading description");
 
-      // If top prediction exists, call /describe
       if (topPrediction) {
-        const descResponse = await fetch(`http://localhost:8000/describe?plant_name=${encodeURIComponent(topPrediction)}`);
+        const descResponse = await fetch(
+          `http://localhost:8000/describe?plant_name=${encodeURIComponent(topPrediction)}`
+        );
         const descResult = await descResponse.json();
 
-        // Append description
-        caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}'`;
-        description.textContent = `${descResult.message}`;
+        caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}`;
+        stopLoadingAnimation(description, descResult.message);
       } else {
-        description.textContent += `\n\nDescription not found.`;
+        stopLoadingAnimation(description, "Description not found.");
       }
     } catch (error) {
       console.error("Upload or prediction failed:", error);
       caption.textContent = "Upload or prediction failed.";
+      stopLoadingAnimation(description, "An error occurred while loading the description.");
     }
   });
 });
