@@ -45,8 +45,6 @@ class classifier:
             self.model.num_classes = 1081 
         else:
             self.model = model_type(num_classes = 1081)
-
-        print(self.model)
         #supplied custom model
         if model_path:
             self.model_path = model_path
