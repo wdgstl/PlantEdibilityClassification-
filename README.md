@@ -1,4 +1,4 @@
-## Setup Instructions
+## UI Setup Instructions
 
 1. **Git clone the repository**
    ```bash
