@@ -40,7 +40,7 @@ h1 {
 
 #caption {
   font-size: 1.2em;
-  font-weight: bold;
+  color: green;
   padding: 1rem;
   background-color: #ffffff;
   border-radius: 8px;
@@ -51,6 +51,7 @@ h1 {
 
 #description {
   font-size: 1.1em;
+  font-style: italic;
   padding: 1rem;
   background-color:white;
   border-radius: 8px;

@@ -43,7 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const topPrediction = result.prediction?.[0]?.[0];
 
-      caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}`;
+      const predictions = result.prediction;
+
+      for (let i = 0; i < predictions.length; i++) {
+        console.log(predictions[i])
+        caption.textContent += predictions[i][0] + ": " + predictions[i][1] * 100 + "%" +  "\n";
+        if(i != predictions.length-1){
+          caption.textContent += "\n";
+        }
+      }
+
+      // caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}`;
+      
       startLoadingAnimation(description, "Loading description");
 
       if (topPrediction) {
@@ -52,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         const descResult = await descResponse.json();
 
-        caption.textContent = `Prediction: ${JSON.stringify(result.prediction)}`;
         stopLoadingAnimation(description, descResult.message);
       } else {
         stopLoadingAnimation(description, "Description not found.");
