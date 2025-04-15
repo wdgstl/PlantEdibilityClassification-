@@ -5,3 +5,7 @@ __pycache__/
 temp_uploads/
 package-lock.json
 *.env
+102flowers_data/102flowers.tgz
+102flowers_data/jpg/
+102flowers_data/102flowers_extracted/
+myvenv
