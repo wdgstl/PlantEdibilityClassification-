@@ -16,10 +16,6 @@ import os
 import uvicorn
 from dotenv import load_dotenv
 
-#if running main.py manually, replace with path to ur .env
-# load_dotenv("../.env")
-
-#if using docker, leave empty: 
 load_dotenv()
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
