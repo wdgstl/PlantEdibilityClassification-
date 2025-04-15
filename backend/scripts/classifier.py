@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from sklearn.metrics import classification_report
 from tqdm import tqdm
+import torch.nn as nn
 
 
 # Add the parent directory of 'scripts' to the path
@@ -14,7 +15,7 @@ try:
 except ModuleNotFoundError:
     from backend.scripts.utils import load_model 
 
-from torchvision.models import resnet18, resnet50
+from torchvision.models import resnet18, resnet50, densenet121, mobilenet_v3_large, shufflenet_v2_x1_0, squeezenet1_0, efficientnet_b0
 from torchvision import models, transforms
 import torch
 from PIL import Image
@@ -25,17 +26,31 @@ import sys
 class classifier:
     def __init__(self, model_type = resnet18, model_path=None, class_mapping_path=None):
         self.model_name = model_type.__name__
+        if self.model_name == 'shufflenet_v2_x1_0':
+            self.model_name = 'shufflenet'
+        elif self.model_name == 'squeezenet1_0':
+            self.model_name = 'squeezenet'
         self.default_model_url = f'https://lab.plantnet.org/seafile/d/01ab6658dad6447c95ae/files/?p=%2F{self.model_name}_weights_best_acc.tar&dl=1'
-        self.default_class_mapping_url = 'https://storage.googleapis.com/kagglesdsdata/datasets/1981237/3270629/plantnet_300K/plantnet300K_species_names.json?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=gcp-kaggle-com%40kaggle-161607.iam.gserviceaccount.com%2F20250408%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20250408T152507Z&X-Goog-Expires=259200&X-Goog-SignedHeaders=host&X-Goog-Signature=a51809678bed4db86b892ba53ddf4daf9cad76d32d9d5fc59027027e5f2781e614387cf6c4d97dc3b31189d270758d2a8660226852a689d8982fae56ba056796086fa36cdb16edfe182c88f824b2b32cb08ee279d967b8f81ad81d16daaf84c625ec4baf43929484de385eb299de2d239f739017640173620e30dbe409fb44cc43b62d663f637bb03f33595833f8aff407a36340bcf74a3a74bf71ff7918633e6082dba1b6e0aa452096650cece72b65a31d657a410962041e0b18df92d0048798be889e3c6364359857b004762d4981b52d655d1ffb40812ba3fff9730a18bfaa4207e6b1239e59d77a4124cb46ff480a868d9cd1c80d55c9baca2688c80353'
         base_dir = os.path.dirname(os.path.abspath(__file__))
-        if model_type == resnet18:
-            self.model = resnet18(num_classes = 1081)
+        if self.model_name == 'inception_v3':
+            self.model = model_type(num_classes = 1081, aux_logits = False)
+        elif self.model_name == 'squeezenet1_0':
+            self.model = model_type()
+            self.model.classifier[1] = nn.Conv2d(
+                in_channels=512,
+                out_channels=1081,  
+                kernel_size=(1, 1),
+                stride=(1, 1)
+            )
+            self.model.num_classes = 1081 
         else:
             self.model = model_type(num_classes = 1081)
+
+        print(self.model)
         #supplied custom model
         if model_path:
             self.model_path = model_path
-        #otherwise, pull defaultc
+        #otherwise, pull default
         else:
             print(f"Downloading model from {self.default_model_url}\n")
             output_file = os.path.join(base_dir, "..", "data", "models", f"{self.model_name}_weights_best_acc.tar")
@@ -43,22 +58,25 @@ class classifier:
             self.model_path = output_file
             print("Download Complete")
         
-        if class_mapping_path:
-            self.class_mapping_path = class_mapping_path
-        else:
-            print(f"Downloading class mapping json from {self.default_class_mapping_url}\n")
-            output_file = os.path.join(base_dir, "..", "data", "class_mapping", "plantnet300K_species_names.json")
-            subprocess.run(["wget", "-O", output_file, self.default_class_mapping_url])
-            self.class_mapping_path = output_file
-            print("Download Complete")
+        output_file = os.path.join(base_dir, "..", "data", "class_mapping", "plantnet300K_species_names.json")
+        self.class_mapping_path = output_file
         load_model(self.model, filename=self.model_path, use_gpu=False)
             
     
     def predict(self, image_path):
         self.model.eval()
+        if self.model_name == "inception_v3":
+            input_size = 299
+            resize_size = 342
+        elif self.model_name == "efficientnet_b0":
+            input_size = 224  
+            resize_size = int(input_size * 1.14) 
+        else:
+            input_size = 224
+            resize_size = 256
         preprocess = transforms.Compose([
-            transforms.Resize(256),
-            transforms.CenterCrop(224),
+            transforms.Resize(resize_size),
+            transforms.CenterCrop(input_size),
             transforms.ToTensor(),  
             transforms.Normalize(
                 mean=[0.485, 0.456, 0.406],

@@ -72,7 +72,11 @@ def load_model(model, filename, use_gpu):
         raise FileNotFoundError
 
     device = 'cuda:0' if use_gpu else 'cpu'
-    d = torch.load(filename, map_location=device)
+    if model.__class__.__name__ == "SqueezeNet":
+        d = torch.load(filename, map_location=device, weights_only=False)
+    else:
+        d = torch.load(filename, map_location=device)
+
     model.load_state_dict(d['model'])
     return d['epoch']
 
