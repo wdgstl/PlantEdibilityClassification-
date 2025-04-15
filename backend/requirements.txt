@@ -13,3 +13,6 @@ fastapi==0.115.12
 python-multipart==0.0.20
 openai==1.72.0
 python-dotenv==1.1.0
+pyarrow==19.0.1
+scikit-learn==1.6.1
+datasets==3.5.0

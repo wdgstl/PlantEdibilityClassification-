@@ -1,4 +1,19 @@
-from scripts.utils import load_model
+import sys
+from pathlib import Path
+import os
+import pandas as pd
+from sklearn.metrics import classification_report
+from tqdm import tqdm
+
+
+# Add the parent directory of 'scripts' to the path
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+try:
+    from scripts.utils import load_model  
+except ModuleNotFoundError:
+    from backend.scripts.utils import load_model 
+
 from torchvision.models import resnet18
 from torchvision import models, transforms
 import torch
@@ -61,6 +76,77 @@ class classifier:
         for i in range(top5_prob.size(0)):
             output.append((id_to_species[top5_catid[i]], top5_prob[i].item()))
         return output
+    
+    def get_metrics(self, path_to_test_parquets):
+        dfs = []
+        for filename in os.listdir(path_to_test_parquets):
+            if filename.endswith(".parquet"):
+                file_path = os.path.join(path_to_test_parquets, filename)
+                print(f"Processing: {file_path}")
+                df = pd.read_parquet(file_path)
+                dfs.append(df)
+        full_df_test = pd.concat(dfs, ignore_index=True)
+        with open(self.class_mapping_path) as f:
+            species_dict = json.load(f)
+        i = 0
+        map_from_df_to_map = {}
+        for key in species_dict:
+            map_from_df_to_map[i] = key
+            i+=1
+        full_df_test['species_true'] = full_df_test['label'].map(lambda x: species_dict.get(map_from_df_to_map.get(x)))
+
+        temp_dir = Path("temp_uploads")
+        temp_dir.mkdir(exist_ok=True)
+
+        print("Running model on test data")
+        for idx, row in tqdm(full_df_test.iterrows(), total=len(full_df_test)):
+            img_bytes = row['image']['bytes']
+            
+            temp_path = temp_dir / f"temp_{idx}.jpg"
+
+            with open(temp_path, "wb") as f:
+                f.write(img_bytes)
+
+            predictions = self.predict(image_path=temp_path)
+            top_5 = []
+            for pred in predictions:
+                top_5.append(pred[0])
+
+            top_species, _ = max(predictions, key=lambda x: x[1])
+            full_df_test.at[idx, 'top_prediction'] = top_species
+            full_df_test.at[idx, 'top_5'] = top_5
+
+            try:
+                temp_path.unlink()  
+            except Exception as e:
+                print(f"Failed to delete {temp_path}: {e}")
+
+        metrics = {}
+        species_accuracy = (full_df_test['species_true'] == full_df_test['top_prediction']).mean()
+        genus_accuracy = (full_df_test['species_true'].str.split("_").str[0] == full_df_test['top_prediction'].str.split("_").str[0] ).mean()
+        top_5_species_accuracy = full_df_test.apply(lambda row: row['species_true'] in row['top_5'], axis=1).mean()
+        top_5_genus_accuracy = full_df_test.apply(lambda row: row['species_true'].split("_")[0] in [pred.split("_")[0] for pred in row['top_5']],axis=1).mean()
+        report = classification_report(
+            full_df_test['species_true'],
+            full_df_test['top_prediction'],
+            zero_division=0,
+            output_dict=True
+        )
+
+        weighted_precision = report['weighted avg']['precision']
+        weighted_recall = report['weighted avg']['recall']
+        weighted_f1 = report['weighted avg']['f1-score']
+        metrics.update({
+            'species_accuracy': species_accuracy,
+            'genus_accuracy': genus_accuracy,
+            'top_5_species_accuracy': top_5_species_accuracy,
+            'top_5_genus_accuracy': top_5_genus_accuracy,
+            'weighted_precision': weighted_precision,
+            'weighted_recall': weighted_recall,
+            'weighted_f1': weighted_f1
+        })
+        return metrics
+
 
 def main():
     #Option 1: Specify Path
