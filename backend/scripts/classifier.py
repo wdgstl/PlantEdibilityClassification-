@@ -15,7 +15,7 @@ try:
 except ModuleNotFoundError:
     from backend.scripts.utils import load_model 
 
-from torchvision.models import resnet18, resnet50, densenet121, mobilenet_v3_large, shufflenet_v2_x1_0, squeezenet1_0, efficientnet_b0
+from torchvision.models import resnet18, resnet50, densenet121, mobilenet_v3_large, shufflenet_v2_x1_0, squeezenet1_0, efficientnet_b0, densenet201
 from torchvision import models, transforms
 import torch
 from PIL import Image
