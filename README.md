@@ -1,26 +1,41 @@
 ## Repository Content
 
 PlantEdibilityClassification-/  
-├── backend/  
-│   ├── Dockerfile  
-│   ├── requirements.txt  
-│   └── server.py  
-├── data/  
-│   ├── edible_plants/  
-│   └── non_edible_plants/  
-├── frontend/  
-│   └── public/  
-│       ├── index.html  
-│       └── styles.css  
-├── output/  
-│   ├── predictions/  
-│   └── logs/  
-├── scripts/  
-│   └── main.py  
-├── .gitignore  
-├── README.md  
-├── package.json  
-└── server.js  
+│── backend/  
+│ ├── data/class_mapping/  
+│ │ ├── plantnet300k_species_names.json    
+│ ├── scripts/  
+│ │ ├── __ init __.py  
+│ │ ├── classifier.py  
+│ │ ├── describe_plant.py  
+│ │ ├── fetch_data.py  
+│ │ ├── main.py  
+│ │ ├── utils.py  
+│ ├── Dockerfile  
+│ ├── LICENSE  
+│ ├── README.md  
+│ ├── docker-compose.yml  
+│ ├── package-lock.json  
+│ ├── requirements.txt  
+│── data/  
+│ ├── data appendix.pdf    
+│── frontend/public/  
+│ ├── index.html  
+│ ├── index.js  
+│ ├── style.css  
+│── output/  
+│ ├── genus_counts.cvs  
+│ ├── model_comparison.png  
+│ ├── species_counts.csv  
+│ ├── ui_screenshot.png  
+│── scripts/  
+│ ├── Analysis_EDA.ipynb  
+│ ├── Test_Data_EDA.ipynb  
+│ ├── data_appendix_scripts.ipynb  
+│── README.md  
+│── package.json  
+│── server.js  
+
 
 ## UI Setup Instructions
 
