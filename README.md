@@ -1,3 +1,27 @@
+## Repository Content
+
+PlantEdibilityClassification-/  
+├── backend/  
+│   ├── Dockerfile  
+│   ├── requirements.txt  
+│   └── server.py  
+├── data/  
+│   ├── edible_plants/  
+│   └── non_edible_plants/  
+├── frontend/  
+│   └── public/  
+│       ├── index.html  
+│       └── styles.css  
+├── output/  
+│   ├── predictions/  
+│   └── logs/  
+├── scripts/  
+│   └── main.py  
+├── .gitignore  
+├── README.md  
+├── package.json  
+└── server.js  
+
 ## UI Setup Instructions
 
 1. **Git clone the repository**
