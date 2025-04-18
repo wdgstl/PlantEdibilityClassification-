@@ -1,5 +1,13 @@
 ## Repository Content
 
+### Software and Platform
+- Programming language: Python
+- Software: Jupyter Notebook (for exploratory analysis), Python scripts
+- Platforms: Works on Windows, MacOS, and Linux
+- See requirements.txt for all required dependencies
+
+### Repository Mapping
+
 PlantEdibilityClassification-/  
 │── backend/  
 │ ├── data/class_mapping/  
@@ -36,8 +44,7 @@ PlantEdibilityClassification-/
 │── package.json  
 │── server.js  
 
-
-## UI Setup Instructions
+### UI Setup Instructions
 
 1. **Git clone the repository**
    ```bash
